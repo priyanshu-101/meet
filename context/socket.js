@@ -16,12 +16,16 @@ export const SocketProvider = (props) => {
     const connection = io();
     console.log("socket connection", connection)
     setSocket(connection);
-  }, []);
 
-  socket?.on('connect_error', async (err) => {
-    console.log("Error establishing socket", err)
-    await fetch('/api/socket')
-  })
+    connection.on('connect_error', async (err) => {
+      console.log("Error establishing socket", err)
+      await fetch('/api/socket')
+    })
+
+    return () => {
+      connection.disconnect(); // Cleanup socket connection on unmount
+    };
+  }, []);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
